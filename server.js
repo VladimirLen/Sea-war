@@ -4,7 +4,7 @@ var path = require('path');
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-const PAS = __dirname +'/src';
+const PAS = __dirname;
 
 app.use(express.static( __dirname + '/dist'));
 app.use(express.static( __dirname + '/picture'));
