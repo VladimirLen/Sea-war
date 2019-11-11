@@ -13,7 +13,7 @@ class Game extends React.Component {
       sea: <img src="sea.png" width="100%"/>,
       ship: <img src="1.png" width="100%"/>,
       shot: <img src="shot.png" width="100%"/>,
-      ship_fire: <img src="/2.png" width="100%"/>,
+      ship_fire: <img src="2.png" width="100%"/>,
       ship_debris: <img src="3.png" width="100%"/>
     }
     this.state = {
@@ -142,6 +142,7 @@ class Game extends React.Component {
   onShot_ship(i, j) {
     if (!this.state.enemy_ready) return;
     if (!this.state.ships_ready) return;
+    if (!this.state.i_ready) return;
     if (!this.state.move) return;
     let squares = onClone(this.state.squares_enemy);
     let position = this.state.position_enemy;
@@ -157,10 +158,10 @@ class Game extends React.Component {
 
 
     this.cellPoint( [[i,j]], cell, shot1, 'shot1');
-    this.socket.emit('shot', [[i, j]], true);
+    this.socket.emit('shot', [[i, j]], src_1 == src_2 ? 2 : 1);
     if ( this.check_position( position[squ], shot1, cell)) {
       this.cellPoint( position[squ], this.picture.ship_debris, shot1, 'shot1');
-      this.socket.emit('shot', position[squ], false);
+      this.socket.emit('shot', position[squ], 3);
       this.setState({count: this.state.count + 1});
       if (this.state.count == 9) {
         alert('!!!Вы победили!!!');
@@ -243,7 +244,10 @@ class Game extends React.Component {
     //обновление выстрелов
     this.socket.on('shot', function( x, value) {
       let squares1 = onClone(band.state.squares1);
-      let ship_fire = value ? band.picture.ship_fire : band.picture.ship_debris;
+      let ship_fire = (value == 1) ? band.picture.shot :
+                      (value == 2) ? band.picture.ship_fire :
+                      band.picture.ship_debris;
+
       band.cellPoint( x, ship_fire, squares1, 'squares1');
     });
     // противник готов
@@ -278,7 +282,6 @@ class Game extends React.Component {
   }
 
   load_page() {
-    if (!this.state.ships_ready) return null;
     if (this.state.enemy_ready) {
       this.socket.emit('coordinats', this.state.squares1 , this.state.position);
       return null;
